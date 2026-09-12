@@ -384,7 +384,7 @@ home-credit-default-risk/
 ├── FEATURES_DESCRIPTION.md          # описание созданных признаков
 ├── README.md
 ├── requirements.txt
-└── .gitignore
+
 ```
 
 
