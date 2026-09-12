@@ -15,480 +15,897 @@ TARGET = 0 - клиент выплачивал кредит без пробле�
 2. СВЯЗЬ ТАБЛИЦ:
 
 application_train / application_test - файлы данных для тренировки и тестирования модели.
+
 Одна строка = одна текущая заявка клиента.
+
 Главный ключ: SK_ID_CURR.
 
 bureau - прошлые кредиты клиента в других банках.
+
 Одна строка = один кредит.
+
 Связь с клиентом через SK_ID_CURR.
+
 Ключ кредита: SK_ID_BUREAU.
 
 bureau_balance - месячная история кредитов из bureau.
+
 Одна строка = один кредит за один месяц.
+
 Связь с bureau через SK_ID_BUREAU.
 
 previous_application - прошлые заявки клиента в Home Credit.
+
 Одна строка = одна заявка.
+
 Связь с клиентом через SK_ID_CURR.
+
 Ключ прошлой заявки: SK_ID_PREV.
 
+
 POS_CASH_balance - месячная история прошлых потребительских кредитов и кредитов наличными.
+
 Одна строка = один договор за один месяц.
 
+
 installments_payments - история платежей по прошлым кредитам.
+
 Одна строка = один платёж по графику.
 
 credit_card_balance - месячная история прошлых кредитных карт.
+
 Одна строка = одна карта за один месяц.
 
 3. ЧТЕНИЕ ИМЕНИ ПРИЗНАКА:
 
 Префиксы:
+
 BUREAU - признак из bureau.
+
 BB - признак из bureau_balance.
+
 PREV - признак из previous_application.
+
 POS - признак из POS_CASH_balance.
+
 INST - признак из installments_payments.
+
 CC - признак из credit_card_balance.
+
 KMEANS - признак, полученный с помощью кластеризации KMeans.
 
+
 Частые окончания:
+
 COUNT - количество записей или событий.
+
 SUM - сумма значений.
+
 MEAN - среднее значение.
+
 MEDIAN - медиана.
+
 MIN - минимальное значение.
+
 MAX - максимальное значение.
+
 STD - стандартное отклонение.
+
 SHARE - доля записей (от 0 до 1).
+
 RATIO - отношение одного значения к другому.
+
 DIFF - разность величин.
+
 LAST - последнее, т.е. новое значение.
+
 CLIENT - итоговый признак на уровне клиента.
+
 IS_* - бинарный индикатор: 1 - условие выполнено, 0 - нет.
+
 TREND - изменение признака между коротким и длинным временным окном.
+
 DISTANCE - расстояние объекта до центра кластера KMeans.
+
 CLUSTER - номер ближайшего кластера KMeans.
+
 
 4. ВРЕМЯ В ПРИЗНАКАХ
 Большинство дат записано относительно текущей заявки:
+
 0 - день или месяц текущей заявки.
+
 -1 - один день или месяц до заявки.
+
 -100 - сто дней до заявки.
+
 +30 - событие планируется через 30 дней после заявки.
 
 
+
 Существуют признаки с "LAST_3", "LAST_5", "LAST_10", это означает: 
+
 последние 3, 5 или 10 событий. Это не календарный период.
+
 Признаки с "LAST_3M", "LAST_6M", "LAST_12M" - это означает:
+
 последние 3, 6 или 12 календарных месяцев.
+
 Признаки с LAST_90D, LAST_180D, LAST_365D, LAST_730D означают:
+
 характеристики за последние 90, 180, 365 или 730 дней.
+
 
 Число 365243 в прошлых заявках не похоже на настоящую дату, заменила его на NaN.
 
+
 5. APPLICATION_TRAIN / APPLICATION_TEST
+
 Основные данные о клиенте и текущей заявке.
+
 Одна строка = одна текущая заявка.
 
+
 Идентификаторы:
+
 SK_ID_CURR - номер текущей заявки, нужен для объединения таблиц.
+
 TARGET - целевая переменная. Есть только в application_train, выделяем его в отдельное место.
 
+
 Параметры кредита:
+
 NAME_CONTRACT_TYPE - тип кредита: обычный кредит или возобновляемый кредит.
+
 AMT_CREDIT - сумма текущего кредита.
+
 AMT_ANNUITY - размер регулярного платежа.
+
 AMT_GOODS_PRICE - цена товара, на который оформляется кредит.
+
 WEEKDAY_APPR_PROCESS_START - день недели, когда подали заявку.
+
 HOUR_APPR_PROCESS_START - час подачи заявки.
 
+
 Данные о клиенте:
+
 CODE_GENDER - пол клиента.
+
 DAYS_BIRTH - возраст в днях (со знаком минус), возраст в годах: -DAYS_BIRTH / 365.
+
 CNT_CHILDREN - количество детей.
+
 CNT_FAM_MEMBERS - количество членов семьи.
+
 NAME_FAMILY_STATUS - семейное положение.
+
 NAME_TYPE_SUITE - кто сопровождал клиента при подаче заявки.
 
+
 Доход, работа и образование:
+
 AMT_INCOME_TOTAL - общий доход клиента.
+
 NAME_INCOME_TYPE - тип дохода: зарплата, пенсия, предпринимательство и т. п.
+
 NAME_EDUCATION_TYPE - уровень образования.
+
 OCCUPATION_TYPE - профессия или вид работы.
+
 ORGANIZATION_TYPE - тип организации-работодателя.
+
 DAYS_EMPLOYED - сколько дней клиент работает на текущем месте.
 
+
 Контакты:
+
 FLAG_MOBIL - указан мобильный телефон.
+
 FLAG_EMP_PHONE - указан телефон работодателя.
+
 FLAG_WORK_PHONE - указан рабочий телефон клиента.
+
 FLAG_CONT_MOBILE - мобильный телефон, который доступен для связи.
+
 FLAG_PHONE - указан дополнительный телефон.
+
 FLAG_EMAIL - указана электронная почта.
 
+
 Документы и регистрация:
+
 DAYS_REGISTRATION - сколько дней прошло с момента регистрации по месту жительства.
+
 DAYS_ID_PUBLISH - сколько дней прошло с выдачи или обновления документа.
+
 DAYS_LAST_PHONE_CHANGE - сколько дней прошло с последней смены телефона.
+
 FLAG_DOCUMENT_2...FLAG_DOCUMENT_21 - наличие разных документов: 1 это документ есть, 0 - нет.
 
+
 Автомобиль и жильё:
+
 FLAG_OWN_CAR - есть ли автомобиль.
+
 OWN_CAR_AGE - возраст автомобиля.
+
 FLAG_OWN_REALTY - есть ли недвижимость.
+
 NAME_HOUSING_TYPE - где живёт клиент: своё жильё, аренда, с родителями и т. п.
 
+
 Регион:
+
 REGION_POPULATION_RELATIVE - относительный размер населения региона.
+
 REGION_RATING_CLIENT - рейтинг региона.
+
 REGION_RATING_CLIENT_W_CITY - рейтинг региона с учётом города.
+
 REG_REGION_NOT_LIVE_REGION - регион регистрации не совпадает с регионом проживания.
+
 REG_REGION_NOT_WORK_REGION - регион регистрации не совпадает с регионом работы.
+
 LIVE_REGION_NOT_WORK_REGION - регион проживания не совпадает с регионом работы.
+
 REG_CITY_NOT_LIVE_CITY - город регистрации не совпадает с городом проживания.
+
 REG_CITY_NOT_WORK_CITY - город регистрации не совпадает с городом работы.
+
 LIVE_CITY_NOT_WORK_CITY - город проживания не совпадает с городом работы.
 
+
 Внешние оценки клиента:
+
 EXT_SOURCE_1, EXT_SOURCE_2 и EXT_SOURCE_3 - три оценки клиента из внешних источников, точные формулы скрыты.
 
+
 Сведения о доме:
+
 Для многих колонок есть три версии:
 
+
 AVG - среднее;
+
 MODE - мода;
+
 MEDI — медиана.
 
+
 APARTMENTS_* - характеристика квартир.
+
 BASEMENTAREA_* - площадь подвала.
+
 YEARS_BEGINEXPLUATATION_* - год начала эксплуатации дома.
+
 YEARS_BUILD_* - год постройки дома.
+
 COMMONAREA_* - площадь общих помещений.
+
 ELEVATORS_* - количество лифтов.
+
 ENTRANCES_* - количество подъездов.
+
 FLOORSMAX_* - максимальное количество этажей.
+
 FLOORSMIN_* - минимальное количество этажей.
+
 LANDAREA_* - площадь участка.
+
 LIVINGAPARTMENTS_* - характеристика жилых квартир.
+
 LIVINGAREA_* - жилая площадь.
+
 NONLIVINGAPARTMENTS_* - характеристика нежилых помещений.
+
 NONLIVINGAREA_* - нежилая площадь.
+
 FONDKAPREMONT_MODE - тип фонда капитального ремонта.
+
 HOUSETYPE_MODE - тип дома.
+
 TOTALAREA_MODE - общая площадь жилья.
+
 WALLSMATERIAL_MODE - материал стен.
+
 EMERGENCYSTATE_MODE - находится ли дом в аварийном состоянии.
 
+
 Окружение клиента:
+
 OBS_30_CNT_SOCIAL_CIRCLE - количество людей из окружения с наблюдаемой просрочкой до 30 дней.
+
 DEF_30_CNT_SOCIAL_CIRCLE - количество людей из окружения с плохим статусом в окне 30 дней.
+
 OBS_60_CNT_SOCIAL_CIRCLE - количество людей из окружения с наблюдаемой просрочкой для 60 дней.
+
 DEF_60_CNT_SOCIAL_CIRCLE - количество людей из окружения с плохим статусом для 60 дней.
 
+
 Запросы в бюро кредитных историй:
+
 AMT_REQ_CREDIT_BUREAU_HOUR - количество запросов за последний час.
+
 AMT_REQ_CREDIT_BUREAU_DAY - количество запросов за последний день.
+
 AMT_REQ_CREDIT_BUREAU_WEEK - количество запросов за последнюю неделю.
+
 AMT_REQ_CREDIT_BUREAU_MON - количество запросов за последний месяц.
+
 AMT_REQ_CREDIT_BUREAU_QRT - количество запросов за последний квартал.
+
 AMT_REQ_CREDIT_BUREAU_YEAR - количество запросов за последний год.
 
+
 6. BUREAU
+
 Прошлые кредиты клиента в других банках.
+
 Одна строка = один прошлый кредит.
 
+
 Исходные колонки:
+
 SK_ID_CURR - номер клиента/текущей заявки.
+
 SK_ID_BUREAU - номер кредита в бюро кредитных историй.
+
 CREDIT_ACTIVE - состояние кредита: активный, закрытый, проданный и т. п.
+
 CREDIT_CURRENCY - валюта кредита. Названия валют скрыты.
+
 DAYS_CREDIT - сколько дней назад открыли кредит, например, -10 означает более новый кредит, чем -1000.
+
 CREDIT_DAY_OVERDUE - на сколько дней кредит просрочен сейчас.
+
 DAYS_CREDIT_ENDDATE - плановая дата окончания кредита относительно текущей заявки.
+
 DAYS_ENDDATE_FACT - фактическая дата закрытия кредита.
+
 AMT_CREDIT_MAX_OVERDUE- самая большая сумма просрочки по этому кредиту.
+
 CNT_CREDIT_PROLONG- сколько раз продлевали кредит.
+
 AMT_CREDIT_SUM - сумма кредита.
+
 AMT_CREDIT_SUM_DEBT - сколько клиент ещё должен.
+
 AMT_CREDIT_SUM_LIMIT - кредитный лимит.
+
 AMT_CREDIT_SUM_OVERDUE - какая сумма сейчас просрочена.
+
 CREDIT_TYPE -тип кредита: карта, автокредит, ипотека и т. п.
+
 DAYS_CREDIT_UPDATE - сколько дней назад обновлялась информация о кредите.
+
 AMT_ANNUITY -размер регулярного платежа.
+
 Новые признаки для одной строки:
+
 IS_ACTIVE_CREDIT - 1, если кредит активен.
+
 IS_DAY_OVERDUE - 1, если есть просрочка хотя бы на один день.
+
 IS_PROLONGED - 1, если кредит хотя бы раз продлевали.
+
 ENDS_AFTER_APPLICATION - 1, если по плану кредит закончится после текущей заявки.
+
 ENDDATE_DIFF = DAYS_ENDDATE_FACT - DAYS_CREDIT_ENDDATE - показывает, насколько фактическая 
 дата закрытия отличается от плана.
+
 DEBT_TO_CREDIT = AMT_CREDIT_SUM_DEBT / AMT_CREDIT_SUM - какая доля кредита ещё не погашена.
+
 OVERDUE_TO_CREDIT = AMT_CREDIT_SUM_OVERDUE / AMT_CREDIT_SUM - какая доля кредита находится в просрочке.
 
+
 Итоговые признаки клиента:
+
 BUREAU_CREDIT_COUNT - сколько всего кредитов найдено в bureau.
+
 BUREAU_ACTIVE_COUNT - сколько активных кредитов.
+
 BUREAU_ACTIVE_SHARE - Доля активных кредитов.
+
 BUREAU_MOST_RECENT_CREDIT_DAYS - Когда открыли самый новый кредит.
+
 BUREAU_OLDEST_CREDIT_DAYS - Когда открыли самый старый кредит.
+
 BUREAU_MEDIAN_CREDIT_DAYS - Типичная давность кредитов клиента.
+
 BUREAU_CREDIT_HISTORY_LENGTH - Длина доступной кредитной истории.
+
 BUREAU_MAX_DAYS_OVERDUE - Самая большая текущая просрочка в днях.
+
 BUREAU_OVERDUE_CREDIT_COUNT - Количество кредитов с просрочкой.
+
 BUREAU_OVERDUE_CREDIT_SHARE - Доля кредитов с просрочкой.
+
 BUREAU_TOTAL_PROLONG - Сколько всего было продлений.
+
 BUREAU_MAX_PROLONG - Максимальное количество продлений одного кредита.
+
 BUREAU_PROLONG_SHARE - Доля кредитов, которые продлевали.
+
 BUREAU_LAST_PLANNED_ENDDATE - Самая поздняя плановая дата окончания кредита.
+
 BUREAU_MEAN_PLANNED_ENDDATE - Средняя плановая дата окончания.
+
 BUREAU_ENDS_AFTER_APPL_SHARE - Доля кредитов, которые ещё должны действовать после текущей заявки.
+
 BUREAU_LAST_FACT_ENDDATE - Самая поздняя фактическая дата закрытия.
+
 BUREAU_MEAN_FACT_ENDDATE - Средняя фактическая дата закрытия.
+
 BUREAU_MEDIAN_DIFF_ENDDATE - Типичное отличие фактической даты закрытия от плановой.
+
 BUREAU_MAX_DIFF_ENDDATE - Самое большое отличие фактической даты от плановой.
+
 BUREAU_LAST_UPDATE_DAYS - Самое свежее обновление данных бюро.
+
 BUREAU_MEAN_UPDATE_DAYS - Средняя давность обновлений.
+
 BUREAU_MEDIAN_DEBT_RATIO / BUREAU_MAX_DEBT_RATIO - Типичная и максимальная доля непогашенного долга.
+
 BUREAU_MEDIAN_OVERDUE_RATIO / BUREAU_MAX_OVERDUE_RATIO - Типичная и максимальная доля суммы в просрочке.
 
+
 Автоматические признаки:
+
 BUREAU_<КОЛОНКА>_median / BUREAU_<КОЛОНКА>_max - Медиана и максимум по всем кредитам клиента.
+
 BUREAU_LAST_3_<КОЛОНКА>_*
+
 BUREAU_LAST_5_<КОЛОНКА>_*
+
 BUREAU_LAST_10_<КОЛОНКА>_* - Признаки по последним 3, 5 и 10 кредитам.
+
 BUREAU_LAST_<КОЛОНКА> - Значение по самому новому кредиту.
+
 BUREAU_<КАТЕГОРИЯ>_COUNT / _SHARE - Количество и доля каждой категории.
+
 BUREAU_TREND_3_10_<КОЛОНКА> - это медиана последних 3 кредитов минус медиана последних 10.
+
 BUREAU_TREND_5_10_<КОЛОНКА> - это медиана последних 5 кредитов минус медиана последних 10.
 
+
 7. BUREAU_BALANCE
+
 Месячная история кредитов из bureau.
+
 Одна строка = один кредит за один месяц.
 
+
 Исходные колонки:
+
 SK_ID_BUREAU - номер кредита из bureau.
+
 MONTHS_BALANCE - месяц относительно текущей заявки: 0, -1, -2 и т. д.
+
 STATUS - состояние платежа в этом месяце:
+
 0 — просрочки нет;
+
 1 — просрочка 1–30 дней;
+
 2 — просрочка 31–60 дней;
+
 3 — просрочка 61–90 дней;
+
 4 — просрочка 91–120 дней;
+
 5 — просрочка больше 120 дней или очень плохой статус;
+
 C — кредит закрыт;
+
 X — информации нет.
 
+
 Новые признаки:
+
 IS_BB_OVERDUE - 1, если STATUS равен 1, 2, 3, 4 или 5.
+
 IS_BB_SEVERE_OVERDUE - 1, если STATUS равен 3, 4 или 5, это просрочка не меньше 61 дня.
+
 BB_MONTH_COUNT - сколько месяцев истории доступно.
+
 BB_OLDEST_MONTH / BB_MOST_RECENT_MONTH - самый старый и самый новый месяц.
+
 BB_HISTORY_LENGTH - длина истории кредита.
+
 BB_OVERDUE_MONTH_COUNT - сколько месяцев было с просрочкой.
+
 BB_SEVERE_OVERDUE_MONTH_COUNT - сколько месяцев было с тяжёлой просрочкой.
+
 BB_OVERDUE_MONTH_SHARE - доля месяцев с просрочкой.
+
 BB_SEVERE_OVERDUE_MONTH_SHARE - доля месяцев с тяжёлой просрочкой.
+
 BB_CREDIT_WITH_HISTORY_COUNT - для скольких кредитов клиента есть месячная история.
+
 BB_HISTORY_LENGTH_MAX / BB_HISTORY_LENGTH_MEDIAN - максимальная и типичная длина истории 
 отдельных кредитов.
+
 BB_OLDEST_MONTH_CLIENT / BB_MOST_RECENT_MONTH_CLIENT - самая старая и самая новая запись 
 клиента.
+
 BB_STATUS_<СТАТУС>_COUNT / _SHARE - количество и доля каждого статуса.
+
 BB_LAST_3M_* / BB_LAST_6M_* / BB_LAST_12M_* - те же показатели только за последние 3, 6 и 12 месяцев.
 
+
 8. PREVIOUS_APPLICATION
+
 Прошлые заявки клиента в Home Credit.
+
 Одна строка = одна прошлая заявка.
 
+
 Исходные колонки:
+
 SK_ID_PREV - номер прошлой заявки или договора.
+
 SK_ID_CURR - Номер текущей заявки клиента.
+
 NAME_CONTRACT_TYPE - Тип запрошенного кредита.
+
 AMT_ANNUITY - Размер регулярного платежа.
+
 AMT_APPLICATION - Сколько денег просил клиент.
+
 AMT_CREDIT - Сколько денег ему одобрили.
+
 AMT_DOWN_PAYMENT - Первоначальный взнос.
+
 AMT_GOODS_PRICE - Цена товара.
+
 WEEKDAY_APPR_PROCESS_START - День недели подачи прошлой заявки.
+
 HOUR_APPR_PROCESS_START - Час подачи прошлой заявки.
+
 FLAG_LAST_APPL_PER_CONTRACT - Была ли эта заявка последней для договора.
+
 NFLAG_LAST_APPL_IN_DAY - Была ли эта заявка последней за день.
+
 RATE_DOWN_PAYMENT - Относительный размер первоначального взноса.
+
 RATE_INTEREST_PRIMARY - Основная процентная ставка.
+
 RATE_INTEREST_PRIVILEGED - Льготная процентная ставка.
+
 NAME_CASH_LOAN_PURPOSE - Для чего брали кредит наличными.
+
 NAME_CONTRACT_STATUS - Результат заявки: одобрена, отказана, отменена и т. п.
+
 DAYS_DECISION - Сколько дней назад приняли решение по заявке.
+
 NAME_PAYMENT_TYPE - Способ оплаты.
+
 CODE_REJECT_REASON - Код причины отказа.
+
 NAME_TYPE_SUITE - Кто сопровождал клиента.
+
 NAME_CLIENT_TYPE - Новый это клиент или повторный.
+
 NAME_GOODS_CATEGORY - Категория товара.
+
 NAME_PORTFOLIO - Группа кредитного продукта.
+
 NAME_PRODUCT_TYPE - Тип продукта.
+
 CHANNEL_TYPE - Канал, через который оформили заявку.
+
 SELLERPLACE_AREA - Площадь торговой точки.
+
 NAME_SELLER_INDUSTRY - Отрасль продавца.
+
 CNT_PAYMENT - Плановое количество платежей.
+
 NAME_YIELD_GROUP - Группа доходности кредита для банка.
+
 PRODUCT_COMBINATION - Комбинация типа кредита и условий продажи.
+
 DAYS_FIRST_DRAWING - Дата первого использования кредита.
+
 DAYS_FIRST_DUE - Дата первого платежа по плану.
+
 DAYS_LAST_DUE_1ST_VERSION - Первая плановая дата последнего платежа.
+
 DAYS_LAST_DUE - Последняя фактическая или текущая дата платежа.
+
 DAYS_TERMINATION - Дата завершения договора.
+
 NFLAG_INSURED_ON_APPROVAL - Был ли кредит застрахован при одобрении.
 
+
 Новые признаки:
+
 CREDIT_TO_APPLICATION = AMT_CREDIT / AMT_APPLICATION - Какую долю от запрошенной суммы одобрили.
+
 DOWN_PAYMENT_SHARE = AMT_DOWN_PAYMENT / AMT_APPLICATION - Доля первоначального взноса.
+
 ESTIMATED_TOTAL_PAYMENT = AMT_ANNUITY * CNT_PAYMENT - Примерная общая сумма всех платежей.
+
 TOTAL_PAYMENT_TO_CREDIT = ESTIMATED_TOTAL_PAYMENT / AMT_CREDIT - Во сколько раз общая выплата больше суммы кредита.
+
 PLANNED_DURATION = DAYS_LAST_DUE_1ST_VERSION - DAYS_FIRST_DUE - Плановая длительность выплат.
+
 ACTUAL_DURATION = DAYS_LAST_DUE - DAYS_FIRST_DUE - Фактическая или актуальная длительность выплат.
+
 PREV_APPLICATION_COUNT - Количество прошлых заявок.
+
 PREV_MOST_RECENT_DECISION / PREV_OLDEST_DECISION - Самое новое и самое старое решение.
+
 PREV_CNT_PAYMENT_MEDIAN / PREV_CNT_PAYMENT_MAX - Типичное и максимальное количество платежей.
+
 PREV_INSURED_SHARE - Доля застрахованных одобренных кредитов.
+
 PREV_LAST_APPL_IN_DAY_SHARE - Доля заявок, которые были последними за день.
+
 PREV_CREDIT_TO_APPLICATION_MEDIAN / _MAX - Типичная и максимальная доля одобренной суммы.
+
 PREV_DOWN_PAYMENT_SHARE_MEDIAN - Типичная доля первоначального взноса.
+
 PREV_TOTAL_PAYMENT_TO_CREDIT_MEDIAN - Типичное отношение общей выплаты к сумме кредита.
+
 PREV_<КОЛОНКА>_median / PREV_<КОЛОНКА>_max - Медиана и максимум по всем прошлым заявкам.
+
 PREV_LAST_3_* / PREV_LAST_5_* / PREV_LAST_10_* - Признаки по последним 3, 5 и 10 заявкам.
+
 PREV_<КАТЕГОРИЯ>_COUNT / _SHARE - Количество и доля каждой категории.
 
+
 9. POS_CASH_BALANCE
+
 Месячная история потребительских кредитов и кредитов наличными.
+
 Одна строка = один договор за один месяц.
 
+
 Исходные колонки:
+
 SK_ID_PREV - Номер прошлого договора.
+
 SK_ID_CURR - Номер текущей заявки клиента.
+
 MONTHS_BALANCE - Месяц относительно текущей заявки.
+
 CNT_INSTALMENT - Общее количество платежей по текущему графику.
+
 CNT_INSTALMENT_FUTURE - Сколько платежей ещё осталось.
+
 NAME_CONTRACT_STATUS - Состояние договора в этом месяце.
+
 SK_DPD - Просрочка в днях.
+
 SK_DPD_DEF - Просрочка в днях после учёта допустимой небольшой задержки.
 
+
 Новые признаки:
+
 POS_IS_OVERDUE - 1, если SK_DPD > 0.
+
 POS_IS_OVERDUE_DEF - 1, если SK_DPD_DEF > 0.
+
 POS_COMPLETION_RATIO = (CNT_INSTALMENT - CNT_INSTALMENT_FUTURE) / CNT_INSTALMENT - Какая часть графика уже пройдена.
+
 POS_MONTH_COUNT - Сколько месяцев истории доступно.
+
 POS_OLDEST_MONTH / POS_MOST_RECENT_MONTH - Самый старый и самый новый месяц.
+
 POS_HISTORY_LENGTH - Длина истории договора.
+
 POS_MAX_DPD / POS_MAX_DPD_DEF - Самая большая просрочка.
+
 POS_OVERDUE_MONTH_COUNT / POS_OVERDUE_DEF_MONTH_COUNT - Количество месяцев с просрочкой.
+
 POS_COMPLETION_RATIO_MEDIAN / _MAX - Типичная и максимальная пройденная доля графика.
+
 POS_CONTRACT_WITH_HISTORY_COUNT - Сколько договоров с историей есть у клиента.
+
 POS_HISTORY_LENGTH_MAX / _MEDIAN - Максимальная и типичная длина истории договоров.
+
 POS_OLDEST_MONTH_CLIENT / POS_MOST_RECENT_MONTH_CLIENT - Самая старая и самая новая запись клиента.
+
 POS_MAX_DPD_CLIENT / POS_MAX_DPD_DEF_CLIENT - Самая большая просрочка клиента.
+
 POS_OVERDUE_MONTH_SHARE / POS_OVERDUE_DEF_MONTH_SHARE - Доля месяцев с просрочкой.
+
 POS_NAME_CONTRACT_STATUS_<СТАТУС>_COUNT / _SHARE - Количество и доля каждого состояния договора.
+
 POS_LAST_3M_* / POS_LAST_6M_* / POS_LAST_12M_* - Признаки за последние 3, 6 и 12 месяцев.
 
+
 10. INSTALLMENTS_PAYMENTS
+
 История платежей по прошлым кредитам.
+
 Одна строка = один платёж по графику.
 
+
 Исходные колонки:
+
 SK_ID_PREV - Номер прошлого договора.
+
 SK_ID_CURR - Номер текущей заявки клиента.
+
 NUM_INSTALMENT_VERSION - Версия графика платежей.
+
 Если график менялся, версия могла увеличиться.
+
 NUM_INSTALMENT_NUMBER - Номер платежа в графике.
+
 DAYS_INSTALMENT - Когда платёж нужно было внести.
+
 DAYS_ENTRY_PAYMENT - Когда платёж внесли на самом деле.
+
 AMT_INSTALMENT - Сколько нужно было заплатить.
+
 AMT_PAYMENT - Сколько заплатили на самом деле.
 
+
 Новые признаки:
+
 PAYMENT_DELAY = DAYS_ENTRY_PAYMENT - DAYS_INSTALMENT.
+
 если > 0, то заплатили позже срока;
+
 если = 0, то заплатили в срок;
+
 если < 0, то заплатили раньше срока.
+
 LATE_DAYS - Количество дней опоздания. Для платежа без опоздания равно 0.
+
 EARLY_DAYS - На сколько дней раньше срока внесли платёж.
+
 IS_PAYMENT_MISSING - 1, если фактической даты платежа нет.
+
 IS_LATE_PAYMENT - 1, если платёж просрочен.
+
 PAYMENT_DIFF = AMT_INSTALMENT - AMT_PAYMENT - Положительное значение означает недоплату.
+
 IS_UNDERPAID - 1, если клиент заплатил меньше требуемой суммы.
+
 PAYMENT_RATIO = AMT_PAYMENT / AMT_INSTALMENT.
+
 если < 1, то недоплата;
+
 если = 1, то заплатили ровно нужную сумму;
+
 если > 1, то заплатили больше.
+
 UNDERPAYMENT_AMT - Размер недоплаты. Если недоплаты нет, равен 0.
+
 INST_PAYMENT_RECORD_COUNT - Количество записей о платежах.
+
 INST_PAYMENT_MISSING_COUNT / _SHARE - Количество и доля платежей без фактической даты.
+
 INST_INSTALMENT_COUNT - Количество уникальных платежей по графику.
+
 INST_MAX_INSTALMENT_NUMBER - Самый большой номер платежа.
+
 INST_MAX_VERSION - Самая новая версия графика.
+
 INST_DELAY_MEDIAN / INST_DELAY_MAX - Типичная и максимальная задержка.
+
 INST_LATE_DAYS_MAX - Самое большое опоздание в днях.
+
 INST_LATE_PAYMENT_COUNT / _SHARE - Количество и доля просроченных платежей.
+
 INST_PAYMENT_DIFF_MEDIAN / _MAX - Типичная и максимальная недоплата.
+
 INST_UNDERPAID_COUNT / _SHARE - Количество и доля недоплаченных платежей.
+
 INST_PAYMENT_RATIO_MEDIAN / _MIN - Типичное и минимальное отношение оплаты к требуемой сумме.
+
 INST_REQUIRED_SUM - Сколько всего нужно было заплатить.
+
 INST_PAID_SUM - Сколько всего заплатили.
+
 INST_TOTAL_PAYMENT_RATIO = INST_PAID_SUM / INST_REQUIRED_SUM.
+
 INST_CONTRACT_WITH_HISTORY_COUNT - По скольким договорам есть история платежей.
+
 INST_LAST_90D_*, INST_LAST_180D_*, INST_LAST_365D_*, INST_LAST_730D_* - это платёжное поведение за последние 90, 180, 
 365 и 730 дней.
 
+
 11. CREDIT_CARD_BALANCE
+
 Месячная история прошлых кредитных карт.
+
 Одна строка = одна карта за один месяц.
 
+
 Исходные колонки:
+
 SK_ID_PREV - Номер договора кредитной карты.
+
 SK_ID_CURR - Номер текущей заявки клиента.
+
 MONTHS_BALANCE - Месяц относительно текущей заявки.
+
 AMT_BALANCE - Текущая задолженность по карте.
+
 AMT_CREDIT_LIMIT_ACTUAL - Кредитный лимит.
+
 AMT_DRAWINGS_ATM_CURRENT - Сколько денег сняли в банкомате за месяц.
+
 AMT_DRAWINGS_CURRENT - Общая сумма использования кредитных денег за месяц.
+
 AMT_DRAWINGS_OTHER_CURRENT - Сумма прочих операций.
+
 AMT_DRAWINGS_POS_CURRENT - Сумма покупок через терминалы.
+
 AMT_INST_MIN_REGULARITY - Минимальный обязательный платёж.
+
 AMT_PAYMENT_CURRENT - сколько клиент заплатил в текущем месяце.
+
 AMT_PAYMENT_TOTAL_CURRENT - общая сумма платежей в текущем месяце.
+
 AMT_RECEIVABLE_PRINCIPAL - основная часть долга.
+
 AMT_RECIVABLE - общая сумма долга.
+
 AMT_TOTAL_RECEIVABLE - общая сумма требований банка к клиенту.
+
 CNT_DRAWINGS_ATM_CURRENT - количество снятий в банкомате.
+
 CNT_DRAWINGS_CURRENT - общее количество операций.
+
 CNT_DRAWINGS_OTHER_CURRENT - количество прочих операций.
+
 CNT_DRAWINGS_POS_CURRENT - количество покупок через терминалы.
+
 CNT_INSTALMENT_MATURE_CUM - сколько платежей по карте уже должно было наступить.
+
 NAME_CONTRACT_STATUS - состояние карты/договора.
+
 SK_DPD - просрочка в днях.
+
 SK_DPD_DEF - просрочка после учёта допустимой небольшой задержки.
 
+
 Новые признаки:
+
 CC_IS_OVERDUE = 1, если SK_DPD > 0.
+
 CC_IS_OVERDUE_DEF = 1, если SK_DPD_DEF > 0.
+
 CC_UTILIZATION = AMT_BALANCE / AMT_CREDIT_LIMIT_ACTUAL - какая доля кредитного лимита использована.
+
 CC_PAYMENT_TO_MIN = AMT_PAYMENT_CURRENT / AMT_INST_MIN_REGULARITY - во сколько раз платёж больше обязательного минимума.
+
 CC_AVG_DRAWING = AMT_DRAWINGS_CURRENT / CNT_DRAWINGS_CURRENT - средний размер одной операции.
+
 CC_MONTH_COUNT - сколько месяцев истории доступно.
+
 CC_OLDEST_MONTH / CC_MOST_RECENT_MONTH - самый старый и самый новый месяц.
+
 CC_HISTORY_LENGTH - длина истории карты.
+
 CC_MAX_DPD / CC_MAX_DPD_DEF - самая большая просрочка.
+
 CC_OVERDUE_MONTH_COUNT / CC_OVERDUE_DEF_MONTH_COUNT - количество месяцев с просрочкой.
+
 CC_OVERDUE_MONTH_SHARE / CC_OVERDUE_DEF_MONTH_SHARE - доля месяцев с просрочкой.
+
 CC_UTILIZATION_MEDIAN / _MAX - типичная и максимальная доля использованного лимита.
+
 CC_PAYMENT_TO_MIN_MEDIAN / _MAX - типичное и максимальное отношение платежа к минимуму.
+
 CC_AVG_DRAWING_MEDIAN / _MAX - типичный и максимальный средний размер операции.
+
 CC_DRAWINGS_SUM - общая сумма использования кредитных денег.
+
 CC_PAYMENT_SUM - общая сумма платежей.
+
 CC_CONTRACT_WITH_HISTORY_COUNT - количество кредитных карт с историей.
+
 CC_NAME_CONTRACT_STATUS_<СТАТУС>_COUNT / _SHARE -количество и доля каждого состояния договора.
+
 CC_LAST_3M_* / CC_LAST_6M_* / CC_LAST_12M_* - признаки за последние 3, 6 и 12 месяцев.
+
 
 12. ВРЕМЕННЫЕ ТРЕНД
 
