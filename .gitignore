@@ -26,6 +26,7 @@ submissions/*
 # Сохранённые графики
 reports/figures/*
 !reports/figures/.gitkeep
+!reports/figures/*.png
 
 # Секретные файлы
 .env
